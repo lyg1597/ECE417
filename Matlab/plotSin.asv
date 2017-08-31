@@ -1,0 +1,7 @@
+function plotSin(f1,f2)
+shading 
+x=linspace(0,2*pi,f1*16+1)
+y=linspace(0,2*pi,f2*16+1)
+[X,Y]=meshgrid(x,y)
+Z=sin(f1*X)+sin(f2*Y)
+plot3(X,Y,Z)
