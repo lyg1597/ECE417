@@ -138,9 +138,11 @@ guidata(hObject,handles);
 
 %compute the weighting matrix
 %(this line is for free. un-comment once you've written the RF function)
-% W = RF(handles);
-% handles.W = W;
-
+ W = RF(handles);
+ handles.W = W;
+ 
+ for n=handles.posInds
+     
 %compute weighted distances (#2)
 
 %return rank-sorted list of top indices (#3)
@@ -186,8 +188,20 @@ function W = RF(handles)
 %
 %=========================================================================
 %=========================================================================
+W=zeros(47);
 
-%good luck!
+if size(handles.posInds)==1
+    W=eye(47);
+else
+    for n=1:48
+        featureN={};
+        for m=handles.posInds;
+            featureN=[featureN,handles.META_DATA(n,m)];
+        end
+        W(n,n)=1/(((std(featureN))^2)+0.0222);
+    end
+end
+    
 
 %=========================================================================
 %=========================================================================
