@@ -135,14 +135,9 @@ guidata(hObject,handles);
 %=========================================================================
 
 %compute the query centroid (#1)
-
-%compute the weighting matrix
-%(this line is for free. un-comment once you've written the RF function)
- W = RF(handles);
- handles.W = W;
  qc=zeros(47,1);
  currentTopInds=zeros(1,20);
- simi=zeros(1,1400);
+ dist=zeros(1,1400);
  rank=zeros(1,1400);
  sorted_ind=zeros(1,1400);
  for n=1:47
@@ -153,14 +148,19 @@ guidata(hObject,handles);
          qc(n,1)=temp;
      end
  end
- 
+
+%compute the weighting matrix
+%(this line is for free. un-comment once you've written the RF function)
+ W = RF(handles);
+ handles.W = W;
+
  for n=1:1400
-     simi(n)=((qc-handles.META_DATA(:,n)).')*W*(qc-handles.META_DATA(:,n));
+     dist(n)=((qc-handles.META_DATA(:,n)).')*W*(qc-handles.META_DATA(:,n));
  end
  
  for n=2:1400
      for m=1:n
-         if simi(m)>=simi(n)
+         if dist(m)>=dist(n)
              rank(n)=rank(n)+1;
          else
              rank(m)=rank(m)+1;
