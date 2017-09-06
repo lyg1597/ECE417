@@ -140,9 +140,42 @@ guidata(hObject,handles);
 %(this line is for free. un-comment once you've written the RF function)
  W = RF(handles);
  handles.W = W;
+ qc=zeros(47,1);
+ currentTopInds=zeros(1,20);
+ simi=zeros(1,1400);
+ rank=zeros(1,1400);
+ sorted_ind=zeros(1,1400);
+ for n=1:47
+     temp=0;
+     for m=handles.posInds
+         temp=temp+handles.META_DATA(n,m);
+         temp=temp/length(handles.posInds);
+         qc(n,1)=temp;
+     end
+ end
  
- for n=handles.posInds
-     
+ for n=1:1400
+     simi(n)=((qc-handles.META_DATA(:,n)).')*W*(qc-handles.META_DATA(:,n));
+ end
+ 
+ for n=2:1400
+     for m=1:n
+         if simi(m)>=simi(n)
+             rank(n)=rank(n)+1;
+         else
+             rank(m)=rank(m)+1;
+         end
+     end
+ end
+ 
+ for n=1:1400
+     sorted_ind(1401-rank(n))=n;
+ end
+ 
+ for n=1:20
+     currentTopInds(n)=sorted_ind(n);
+ end
+ handles.currentTopInds=currentTopInds;
 %compute weighted distances (#2)
 
 %return rank-sorted list of top indices (#3)
@@ -193,12 +226,12 @@ W=zeros(47);
 if size(handles.posInds)==1
     W=eye(47);
 else
-    for n=1:48
-        featureN={};
-        for m=handles.posInds;
+    for n=1:47
+        featureN=[];
+        for m=handles.posInds
             featureN=[featureN,handles.META_DATA(n,m)];
         end
-        W(n,n)=1/(((std(featureN))^2)+0.0222);
+        W(n,n)=1/(var(featureN,1)+0.0222);
     end
 end
     
