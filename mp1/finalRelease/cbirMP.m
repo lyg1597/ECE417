@@ -141,12 +141,9 @@ guidata(hObject,handles);
  rank=zeros(1,1400);
  sorted_ind=zeros(1,1400);
  for n=1:47
-     temp=0;
-     for m=handles.posInds
-         temp=temp+handles.META_DATA(n,m);
-         temp=temp/length(handles.posInds);
-         qc(n,1)=temp;
-     end
+ for n=1:47
+     qc(n)=mean(handles.META_DATA(n,handles.posInds));
+ end
  end
 
 %compute the weighting matrix
@@ -227,11 +224,9 @@ if size(handles.posInds)==1
     W=eye(47);
 else
     for n=1:47
-        featureN=[];
-        for m=handles.posInds
-            featureN=[featureN,handles.META_DATA(n,m)];
-        end
-        W(n,n)=1/(var(featureN,1)+0.0222);
+    for n=1:47
+        W(n,n)=1/(var(handles.META_DATA(n,handles.posInds),1)+0.0222);
+    end
     end
 end
     
