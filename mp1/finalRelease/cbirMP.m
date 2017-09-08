@@ -72,6 +72,13 @@ load databaseInfo.mat
 string = 'DATABASE FILES LOADED.';
 set(handles.info_box,'String',string);
 
+round=0;
+session=0;
+precision=zeros(5,3);
+handles.round=round;
+handles.session=session;
+handles.precision=precision;
+
 handles.META_DATA = META_DATA; 
 handles.filenames = LIST;
 guidata(hObject,handles)
@@ -141,21 +148,21 @@ guidata(hObject,handles);
  rank=zeros(1,1400);
  sorted_ind=zeros(1,1400);
  for n=1:47
- for n=1:47
-     qc(n)=mean(handles.META_DATA(n,handles.posInds));
- end
+      qc(n)=mean(handles.META_DATA(n,handles.posInds));
  end
 
 %compute the weighting matrix
 %(this line is for free. un-comment once you've written the RF function)
  W = RF(handles);
  handles.W = W;
-
+ 
+%compute weighted distances (#2)
  for n=1:1400
      dist(n)=((qc-handles.META_DATA(:,n)).')*W*(qc-handles.META_DATA(:,n));
  end
  
- for n=2:1400
+%return rank-sorted list of top indices (#3)
+for n=2:1400
      for m=1:n
          if dist(m)>=dist(n)
              rank(n)=rank(n)+1;
@@ -173,10 +180,29 @@ guidata(hObject,handles);
      currentTopInds(n)=sorted_ind(n);
  end
  handles.currentTopInds=currentTopInds;
-%compute weighted distances (#2)
-
-%return rank-sorted list of top indices (#3)
-
+ 
+ %record precision information and plot the result
+ if W==eye(47)
+     handles.round=0;
+     handles.session=handles.session+1;
+ else
+     handles.round=handles.round+1;
+     handles.precision(handles.session,handles.round)=length(handles.posInds)/20;
+ end
+ 
+ if(handles.session==5 && handles.round==3)
+     figure(open(cbirMP.fig));
+    subplot(5,1,1);
+    plot([1,2,3],handles.precision(1,1:3));
+    subplot(5,1,2);
+    plot([1,2,3],handles.precision(2,1:3));
+    subplot(5,1,3);
+    plot([1,2,3],handles.precision(3,1:3));
+    subplot(5,1,4);
+    plot([1,2,3],handles.precision(4,1:3));
+    subplot(5,1,5);
+    plot([1,2,3],handles.precision(5,1:3));
+ end
 %=========================================================================
 %=========================================================================
 %
@@ -224,9 +250,7 @@ if size(handles.posInds)==1
     W=eye(47);
 else
     for n=1:47
-    for n=1:47
         W(n,n)=1/(var(handles.META_DATA(n,handles.posInds),1)+0.0222);
-    end
     end
 end
     
