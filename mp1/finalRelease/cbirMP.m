@@ -72,13 +72,6 @@ load databaseInfo.mat
 string = 'DATABASE FILES LOADED.';
 set(handles.info_box,'String',string);
 
-round=0;
-session=0;
-precision=zeros(5,3);
-handles.round=round;
-handles.session=session;
-handles.precision=precision;
-
 handles.META_DATA = META_DATA; 
 handles.filenames = LIST;
 guidata(hObject,handles)
@@ -180,28 +173,10 @@ for n=2:1400
      currentTopInds(n)=sorted_ind(n);
  end
  handles.currentTopInds=currentTopInds;
- 
- %record precision information and plot the result
- if W==eye(47)
-     handles.round=0;
-     handles.session=handles.session+1;
- else
-     handles.round=handles.round+1;
-     handles.precision(handles.session,handles.round)=length(handles.posInds)/20;
- end
- 
- if(handles.session==5 && handles.round==3)
-     figure(open(cbirMP.fig));
-    subplot(5,1,1);
-    plot([1,2,3],handles.precision(1,1:3));
-    subplot(5,1,2);
-    plot([1,2,3],handles.precision(2,1:3));
-    subplot(5,1,3);
-    plot([1,2,3],handles.precision(3,1:3));
-    subplot(5,1,4);
-    plot([1,2,3],handles.precision(4,1:3));
-    subplot(5,1,5);
-    plot([1,2,3],handles.precision(5,1:3));
+
+ if ~isequal(W , eye(47))
+    p = length(handles.posInds)/20;
+    assignin('base','p', p);
  end
 %=========================================================================
 %=========================================================================
