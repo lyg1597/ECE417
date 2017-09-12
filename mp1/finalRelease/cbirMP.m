@@ -174,10 +174,9 @@ for n=2:1400
  end
  handles.currentTopInds=currentTopInds;
 
- if ~isequal(W , eye(47))
-    p = length(handles.posInds)/20;
-    assignin('base','p', p);
- end
+ p = length(handles.posInds)/20;
+ assignin('base','p', p);
+
 %=========================================================================
 %=========================================================================
 %
