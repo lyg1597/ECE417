@@ -19,7 +19,23 @@ for i=1:80
 end
 
 raw_pixels=feature_raw_pixel(all_img,90,70);
-[pca,N]=feature_pca(all_img,0.95);
+[pca,N]=feature_pca(raw_pixels,0.95);
+rand_feature=feature_random(raw_pixels,N);
+
+correct = 0;
+rec_idx=zeros(1,80);
+for i=1:80
+    idx=knn_1(i,pca);
+    rec_idx(1,i)=idx;
+    if fix((i-1)/20)==fix((idx-1)/20)
+        correct=correct+1;
+    end
+end
+result=correct/80;
+test=['precision rate: ',num2str(fix(result*10000)/100),'%'];
+display(test);
+display(rec_idx);
+        
 
 end
 
