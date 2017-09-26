@@ -13,7 +13,7 @@ function [pca,N] = feature_pca(X,energy_percent)
     N=i-1;
     topV=zeros(6300,N);
     for i=1:N
-        topV(:,i)=V(:,sorted_index(i));
+        topV(:,i)=V(:,sorted_index(i))/norm(V(:,sorted_index(i)));
     end
     
     pca=transpose(topV)*Z;
