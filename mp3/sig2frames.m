@@ -20,9 +20,9 @@ frames = zeros(Nw, Nf);
 
 win = @hamming;
 for i = 1:Nf
-    start_sample = ??? ;
-    end_sample =   ??? ;
-    frames(:, i) = ??? ;
+    start_sample =  i*Nw*No;
+    end_sample =    (i+1)*Nw*No+Nw*(1-No);
+    frames(:, i) = signal(start_sample:end_sample);
 end
 
 end

@@ -1,7 +1,7 @@
 function run(data_folder)
 %RUN Summary of this function goes here
 %   Detailed explanation goes here
-T=10000 
+T=10000; 
 speaker = 65;
 number = 1;
 instance = 97;
@@ -32,7 +32,8 @@ for i = 1:100
         instance = 97;
     end
 end
-        
+
+
 
 end
 
