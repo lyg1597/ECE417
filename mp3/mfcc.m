@@ -38,7 +38,17 @@ function CC = mfcc(signal, Ncc, varargin)
 
 
 [Nw, No, Fs, M, R, alpha] = process_options(varargin, 'Nw', 240, 'No', 160, 'Fs', 8000, 'M', 26, 'R', [0 4000], 'alpha', 0.97);
-NFFT = ???;
+%get NFFT
+NFFT = 0; 
+i = 0;
+while true
+    if 2^i >= Nw
+        NFFT = 2^i;
+        break;
+    else
+        i = i + 1;
+    end
+end
 K = NFFT/2 + 1;            
                                    
 % Preemphasis filtering
@@ -54,18 +64,18 @@ frames = sig2frames(signal, Nw, No);
 % xlabel('Frequency (Hz)'); ylabel('Weight');
 
 % Compute average magnitude spectra
-X = ??; % X = [NFFT x Nf]. Each column is a spectrum with NFFT frequencies
+X = abs(fft(frames, NFFT)); % X = [NFFT x Nf]. Each column is a spectrum with NFFT frequencies
 X = X./NFFT;
 
 % Apply Mel filterbank to spectra
-Y = ??? ; % Y should be of size = [M x Nf]
+Y = H * X(1:K,:); % Y should be of size = [M x Nf]
 
 % Apply IDCT on log Mel filterbank energies (~ Fourier Transform of
 % log spectrum) to get cepstral coefficients (CCs). CCs should be decorrelated.
-CC = ??? ;
+CC = idct(log(max(1e-6, Y)));
 
 % Take only first Ncc coefficients since higher order coeffs are too small.
-CC = ??? ;
-
+CC = CC(1:Ncc, :);
+CC = CC(:);
 
 end

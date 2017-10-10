@@ -18,11 +18,12 @@ len = length(signal);
 Nf  = floor( (len - No)/(Nw - No) );
 frames = zeros(Nw, Nf);
 
-win = @hamming;
+window = hamming(Nw);
+N_len  = Nw-No;
 for i = 1:Nf
-    start_sample =  i*Nw*No;
-    end_sample =    (i+1)*Nw*No+Nw*(1-No);
-    frames(:, i) = signal(start_sample:end_sample);
+    start_sample = (i-1)*N_len+1 ;
+    end_sample   = (i-1)*N_len+Nw;
+    frames(:, i) = window .* signal(start_sample:end_sample,:);
 end
-
+   
 end
