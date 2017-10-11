@@ -312,7 +312,7 @@ grid on;
 
 %% Speaker recongition cepstrum 1NN
 disp('Cepstrum');
-disp('Speaker Recognition');
+disp('Speech Recognition');
 disp('1NN');
 
 result = zeros(4,4);
@@ -381,7 +381,7 @@ grid on;
 
 %% Speaker recongition MFCC 1NN
 disp('MFCC');
-disp('Speaker Recognition');
+disp('Speech Recognition');
 disp('1NN');
 
 result = zeros(4,4);
