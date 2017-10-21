@@ -145,22 +145,22 @@ for i = 1:N
     xi = X(:,i)'; % [1 x D]
 
 	% Compute the likelihood of xi for each k using mvnpdf()
-    p_xi_given_k = ?? ; % [K  x  1]
+    p_xi_given_k = [mvnpdf(xi, Mu(:,1), Sigma(:,1)),mvnpdf(xi, Mu(:,2), Sigma(:,2))] ; % [K  x  1]
 
     % Ensure p ~= 0 (avoids log 0 case)
     p_xi_given_k = max(p_xi_given_k, eps);
 
     % Compute the num of p(k| xi; theta_init) using Baye's
-    num = ?? ; % [K x 1]
+    num = 0; % [K x 1]
 
     % Compute the den of p(k| xi; theta_init) using Baye's
-    den = ?? ; % [1 x 1]
+    den = sum(p_xi_given_k); % [1 x 1]
 
     % Compute p(k| xi; theta_init) from num and den
-    p_k_given_xi = ?? ;
+    p_k_given_xi = p_xi_given_k*den/p_xi;
 
     % Save p(k| xi; theta_init) in gamma matrix
-    gamma(i,:) = ?? ; % [1 x K] 
+    gamma(i,:) = p_k_given_xi; % [1 x K] 
 
     % At this point, we should have sum(gamma(i,:)) = 1 (or very close to 1)
     % Otherwise sth might be wrong!
@@ -187,19 +187,32 @@ end
 D = size(X, 1);
 
 % Using gamma probabilities, compute the number of obsvns in each cluster
-Nk = ?? ; % [1 x K]. Make sure sum(Nk) is N. Otherwise sth might be wrong!
+tmp = 0;
+
+for i=1:N
+    if gamm(i,1)>gamm(i,2)
+        tmp=tmp+1;
+    end
+end
+Nk = [tmp,N-tmp]; % [1 x K]. Make sure sum(Nk) is N. Otherwise sth might be wrong!
 
 % Let's compute the component density parameters of the GMM:
 % weights, means, cov matrices
 
 % Step 1: Compute weights of the component densities
-Weight = ?? ; % [1 x K]
+Weight = [Nk(1)/N,Nk(2)/N] ; % [1 x K]
 
 % Step 2: Compute means as the weighted sum of obsvns where
 % the weights of this sum are the normalized gamma values. We'll denote the
 % weights by rho.
-rho = ?? ; % [N x K]
-Mu = ?? ; % [D x K]
+tmp = gamma;
+for i=1:N
+    for j=1:K
+        tmp(i,j)=tmp(i,j)*Weight(1,j);
+    end
+end
+rho = tmp; % [N x K]
+Mu = []; % [D x K]
 
 % Step 3: Compute diagonal covariance matrices as weighted sum of outer products
 % of rank-1 centered matrices. The weights used in the summation are simply
