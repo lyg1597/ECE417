@@ -151,13 +151,13 @@ for i = 1:N
     p_xi_given_k = max(p_xi_given_k, eps);
 
     % Compute the num of p(k| xi; theta_init) using Baye's
-    num = 0; % [K x 1]
+    num = bsxFun(@times,p_xi_given_k,Weight); % [K x 1]
 
     % Compute the den of p(k| xi; theta_init) using Baye's
-    den = sum(p_xi_given_k); % [1 x 1]
+    den = sum(bsxFun(@times,p_xi_given_k,Weight)); % [1 x 1]
 
     % Compute p(k| xi; theta_init) from num and den
-    p_k_given_xi = p_xi_given_k*den/p_xi;
+    p_k_given_xi = num/den;
 
     % Save p(k| xi; theta_init) in gamma matrix
     gamma(i,:) = p_k_given_xi; % [1 x K] 
@@ -225,9 +225,9 @@ for k = 1: K
     % Scale each column of the centered matrix Z with the rho values
     % corresponding to component k. So we need
     % [rho1*z1 rho2*z2 ... rhoN*zN]
-    Zscaled = ?? ; % [D x N]
+    Zscaled = bsxfun(@times,rho,Z) ; % [D x N]
     
     % Now compute the outer product of Zscaled and Z to get the cov. matrix.
     % But keep only the diag elements.
-    Sigma(:, k) = ?? ; % [D x K]
+    Sigma(:, k) =  Zscaled*transpose(Z); % [D x K]
 end
