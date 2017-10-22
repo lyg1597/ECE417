@@ -145,17 +145,18 @@ for i = 1:N
     xi = X(:,i)'; % [1 x D]
 
 	% Compute the likelihood of xi for each k using mvnpdf()
-    p_xi_given_k = [mvnpdf(xi.', Mu(:,1), Sigma(:,1));mvnpdf(xi.', Mu(:,2), Sigma(:,2))] ; % [K  x  1]
+    p_xi_given_k = [mvnpdf(xi, Mu(:,1).', diag(Sigma(:,1)));mvnpdf(xi, Mu(:,2).', diag(Sigma(:,2)))] ; % [K  x  1]
 
     % Ensure p ~= 0 (avoids log 0 case)
     p_xi_given_k = max(p_xi_given_k, eps);
 
     % Compute the num of p(k| xi; theta_init) using Baye's
     % num = p_xi_given_k*Weight(:,i); % [K x 1]
-    num = bsxfun(@times,p_xi_given_k,Weight); % [K x 1]
-
+    % num = bsxfun(@times,p_xi_given_k,Weight); % [K x 1]
+    num = Weight.*p_xi_given_k;
+    
     % Compute the den of p(k| xi; theta_init) using Baye's
-    den = sum(bsxFun(@times,p_xi_given_k,Weight)); % [1 x 1]
+    den = sum(num); % [1 x 1]
 
     % Compute p(k| xi; theta_init) from num and den
     p_k_given_xi = num/den;
@@ -191,7 +192,7 @@ D = size(X, 1);
 tmp = 0;
 
 for i=1:N
-    if gamm(i,1)>gamm(i,2)
+    if gamma(i,1)>gamma(i,2)
         tmp=tmp+1;
     end
 end
@@ -201,19 +202,26 @@ Nk = [tmp,N-tmp]; % [1 x K]. Make sure sum(Nk) is N. Otherwise sth might be wron
 % weights, means, cov matrices
 
 % Step 1: Compute weights of the component densities
-Weight = [Nk(1)/N,Nk(2)/N] ; % [1 x K]
+Weight = Nk/N; % [1 x K]
 
 % Step 2: Compute means as the weighted sum of obsvns where
 % the weights of this sum are the normalized gamma values. We'll denote the
 % weights by rho.
 tmp = gamma;
-for i=1:N
-    for j=1:K
-        tmp(i,j)=tmp(i,j)*Weight(1,j);
-    end
+for i=1:K
+    tmp(:,i)=tmp(:,i)/sum(gamma(:,i));
 end
 rho = tmp; % [N x K]
+
 Mu = []; % [D x K]
+for i=1:K
+    Muk=0;
+    for j=1:N
+        Muk=X(:,j)*rho(j,i)+Muk;
+    end
+    Mu=[Mu,Muk];
+end
+
 
 % Step 3: Compute diagonal covariance matrices as weighted sum of outer products
 % of rank-1 centered matrices. The weights used in the summation are simply
@@ -221,12 +229,12 @@ Mu = []; % [D x K]
 Sigma = zeros(D, K);
 for k = 1: K
     % Center the data matrix X
-    Z = bsxfun(@minus,X,Mu); % Z = [z1 z2 ... zN] = [D x N]
+    Z = bsxfun(@minus,X,Mu(:,k)); % Z = [z1 z2 ... zN] = [D x N]
     
     % Scale each column of the centered matrix Z with the rho values
     % corresponding to component k. So we need
     % [rho1*z1 rho2*z2 ... rhoN*zN]
-    Zscaled = bsxfun(@times,rho,Z) ; % [D x N]
+    Zscaled = bsxfun(@times,transpose(rho(:,k)),Z) ; % [D x N]
     
     % Now compute the outer product of Zscaled and Z to get the cov. matrix.
     % But keep only the diag elements.
