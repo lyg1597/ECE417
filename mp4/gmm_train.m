@@ -145,13 +145,14 @@ for i = 1:N
     xi = X(:,i)'; % [1 x D]
 
 	% Compute the likelihood of xi for each k using mvnpdf()
-    p_xi_given_k = [mvnpdf(xi, Mu(:,1), Sigma(:,1)),mvnpdf(xi, Mu(:,2), Sigma(:,2))] ; % [K  x  1]
+    p_xi_given_k = [mvnpdf(xi.', Mu(:,1), Sigma(:,1));mvnpdf(xi.', Mu(:,2), Sigma(:,2))] ; % [K  x  1]
 
     % Ensure p ~= 0 (avoids log 0 case)
     p_xi_given_k = max(p_xi_given_k, eps);
 
     % Compute the num of p(k| xi; theta_init) using Baye's
-    num = bsxFun(@times,p_xi_given_k,Weight); % [K x 1]
+    % num = p_xi_given_k*Weight(:,i); % [K x 1]
+    num = bsxfun(@times,p_xi_given_k,Weight); % [K x 1]
 
     % Compute the den of p(k| xi; theta_init) using Baye's
     den = sum(bsxFun(@times,p_xi_given_k,Weight)); % [1 x 1]
@@ -160,7 +161,7 @@ for i = 1:N
     p_k_given_xi = num/den;
 
     % Save p(k| xi; theta_init) in gamma matrix
-    gamma(i,:) = p_k_given_xi; % [1 x K] 
+    gamma(i,:) = p_k_given_xi.'; % [1 x K] 
 
     % At this point, we should have sum(gamma(i,:)) = 1 (or very close to 1)
     % Otherwise sth might be wrong!
@@ -220,7 +221,7 @@ Mu = []; % [D x K]
 Sigma = zeros(D, K);
 for k = 1: K
     % Center the data matrix X
-    Z = ?? ; % Z = [z1 z2 ... zN] = [D x N]
+    Z = bsxfun(@minus,X,Mu); % Z = [z1 z2 ... zN] = [D x N]
     
     % Scale each column of the centered matrix Z with the rho values
     % corresponding to component k. So we need
@@ -229,5 +230,5 @@ for k = 1: K
     
     % Now compute the outer product of Zscaled and Z to get the cov. matrix.
     % But keep only the diag elements.
-    Sigma(:, k) =  Zscaled*transpose(Z); % [D x K]
+    Sigma(:, k) =  diag(Zscaled*transpose(Z)); % [D x K]
 end
