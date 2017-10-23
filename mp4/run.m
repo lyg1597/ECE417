@@ -23,6 +23,9 @@ function run( data_dir )
 
     [pca,N]=feature_pca(training_image,0.95);
     feature_CC=feature_cepstrum(training_speech,12,500,50);
-    model=gmm_train(transpose(feature_CC(:,1:330)),2);
+    gmm_1=gmm_train(transpose(feature_CC(:,1:330)),2);
+    gmm_2=gmm_train(transpose(feature_CC(:,331:660)),2);
+    gmm_3=gmm_train(transpose(feature_CC(:,661:990)),2);
+    gmm_4=gmm_train(transpose(feature_CC(:,991:1320)),2);
     
 end
