@@ -1,8 +1,9 @@
 function [pca,N] = feature_pca(X,energy_percent)
 %FEATURE_PCA Summary of this function goes here
 %   Detailed explanation goes here
+    [~,num]=size(X);
     Z=bsxfun(@minus,X,mean(X,2));
-    S=(1/(80-1))*(Z*transpose(Z));
+    S=(1/(num-1))*(Z*transpose(Z));
     [V,D]=eig(S);
     eigvals=diag(D);
     [~,sorted_index]=sort(eigvals,'descend');
