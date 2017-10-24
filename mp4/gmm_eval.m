@@ -13,7 +13,7 @@ LL = ones(N, K);
 
 for k = 1:K
     % Compute the likelihood of the observations w.r.t. the kth component density 
-    LL(:,k) = model.weight(k,:)*mvnpdf(X,transpose(model.mu(:,k)),diag(model.sigma(:,k)));
+    LL(:,k) = model.weight(:,k)*mvnpdf(X,transpose(model.mu(:,k)),diag(model.sigma(:,k)));
 end
 
 % Now LL(i,k) is the likelihood of xi w.r.t kth component density of the GMM

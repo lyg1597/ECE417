@@ -171,7 +171,7 @@ end
 % Evaluate avg. log likelihood of X  w.r.t  model
 model.mu = Mu;
 model.sigma = Sigma;
-model.weight = Weight;
+model.weight = Weight.';
 LL = gmm_eval(X', model);
 
 function [Mu,Sigma,Weight] = mstep(X, gamma)
