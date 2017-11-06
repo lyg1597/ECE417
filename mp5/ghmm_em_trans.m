@@ -33,7 +33,7 @@ for l=1:N
    % disp('You need to insert a line of code into ghmm_em_trans.m that computes')
    % disp('the new transition probabilities A(l,m) from the corresponding')
    % disp('soft-count matrix Na(l,m)')	
-   Anew(l,:) = Naseq(l,:)./sum(Pxxy(:,l,:),1);
+   Anew(l,:) = Naseq(l,:)./sum(Naseq(l,:));
 end
 
 

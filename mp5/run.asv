@@ -39,16 +39,10 @@ function run(path)
     corA5=0;
     corV5=0;
     corAV5=0;
-    
-    [P0_a2,A_a2,mu_a2,sigma_a2]=ghmm_learn(feaA2,N,Ainit);
-    [P0_v2,A_v2,mu_v2,sigma_v2]=ghmm_learn(feaV2,N,Ainit);
-    [P0_av2,A_av2,mu_av2,sigma_av2]=ghmm_learn(feaAV2,N,Ainit);
-    
     [P0_a5,A_a5,mu_a5,sigma_a5]=ghmm_learn(feaA5,N,Ainit);
-    [P0_v5,A_v5,mu_v5,sigma_v5]=ghmm_learn(feaV5,N,Ainit);
-    [P0_av5,A_av5,mu_av5,sigma_av5]=ghmm_learn(feaAV5,N,Ainit);
+            [P0_v5,A_v5,mu_v5,sigma_v5]=ghmm_learn(feaV5,N,Ainit);
+            [P0_av5,A_av5,mu_av5,sigma_av5]=ghmm_learn(feaAV5,N,Ainit);
     for i=1:20
-        disp(i);
         tempfeaA={};
         tempfeaV={};
         tempfeaAV={};
@@ -62,25 +56,25 @@ function run(path)
                     k=k+1;
                 end
             end
-            [tempP0_a2,tempA_a2,tempmu_a2,tempsigma_a2]=ghmm_learn(tempfeaA,N,Ainit);
-            [tempP0_v2,tempA_v2,tempmu_v2,tempsigma_v2]=ghmm_learn(tempfeaV,N,Ainit);
-            [tempP0_av2,tempA_av2,tempmu_av2,tempsigma_av2]=ghmm_learn(tempfeaAV,N,Ainit);
+            [P0_a2,A_a2,mu_a2,sigma_a2]=ghmm_learn(tempfeaA,N,Ainit);
+            [P0_v2,A_v2,mu_v2,sigma_v2]=ghmm_learn(tempfeaV,N,Ainit);
+            [P0_av2,A_av2,mu_av2,sigma_av2]=ghmm_learn(tempfeaAV,N,Ainit);
             
-            [~,scale2A]=ghmm_fwd(feaA2{i},tempA_a2,tempP0_a2,tempmu_a2,tempsigma_a2);
+            [~,scale2A]=ghmm_fwd(feaA2{i},A_a2,P0_a2,mu_a2,sigma_a2);
             [~,scale5A]=ghmm_fwd(feaA2{i},A_a5,P0_a5,mu_a5,sigma_a5);
-            if sum(scale2A)>sum(scale5A)
+            if scale2A>scale5A
                 corA2=corA2+1;
             end
             
-            [~,scale2V]=ghmm_fwd(feaV2{i},tempA_v2,tempP0_v2,tempmu_v2,tempsigma_v2);
+            [~,scale2V]=ghmm_fwd(feaV2{i},A_v2,P0_v2,mu_v2,sigma_v2);
             [~,scale5V]=ghmm_fwd(feaV2{i},A_v5,P0_v5,mu_v5,sigma_v5);
-            if sum(scale2V)>sum(scale5V)
+            if scale2V>scale5V
                 corV2=corV2+1;
             end
             
-            [~,scale2AV]=ghmm_fwd(feaAV2{i},tempA_av2,tempP0_av2,tempmu_av2,tempsigma_av2);
+            [~,scale2AV]=ghmm_fwd(feaAV2{i},A_av2,P0_av2,mu_av2,sigma_av2);
             [~,scale5AV]=ghmm_fwd(feaAV2{i},A_av5,P0_av5,mu_av5,sigma_av5);
-            if sum(scale2AV)>sum(scale5AV)
+            if scale2AV>scale5AV
                 corAV2=corAV2+1;
             end
         else
@@ -93,26 +87,27 @@ function run(path)
                     k=k+1;
                 end
             end
-            
-            [tempP0_a5,tempA_a5,tempmu_a5,tempsigma_a5]=ghmm_learn(tempfeaA,N,Ainit);
-            [tempP0_v5,tempA_v5,tempmu_v5,tempsigma_v5]=ghmm_learn(tempfeaV,N,Ainit);
-            [tempP0_av5,tempA_av5,tempmu_av5,tempsigma_av5]=ghmm_learn(tempfeaAV,N,Ainit);
+
+    
+            [P0_a5,A_a5,mu_a5,sigma_a5]=ghmm_learn(tempfeaA,N,Ainit);
+            [P0_v5,A_v5,mu_v5,sigma_v5]=ghmm_learn(tempfeaV,N,Ainit);
+            [P0_av5,A_av5,mu_av5,sigma_av5]=ghmm_learn(tempfeaAV,N,Ainit);
             
             [~,scale2A]=ghmm_fwd(feaA5{i-10},A_a2,P0_a2,mu_a2,sigma_a2);
-            [~,scale5A]=ghmm_fwd(feaA5{i-10},tempA_a5,tempP0_a5,tempmu_a5,tempsigma_a5);
-            if sum(scale2A)<sum(scale5A)
+            [~,scale5A]=ghmm_fwd(feaA5{i-10},A_a5,P0_a5,mu_a5,sigma_a5);
+            if scale2A>scale5A
                 corA5=corA5+1;
             end
             
             [~,scale2V]=ghmm_fwd(feaV5{i-10},A_v2,P0_v2,mu_v2,sigma_v2);
-            [~,scale5V]=ghmm_fwd(feaV5{i-10},tempA_v5,tempP0_v5,tempmu_v5,tempsigma_v5);
-            if sum(scale2V)<sum(scale5V)
+            [~,scale5V]=ghmm_fwd(feaV5{i-10},A_v5,P0_v5,mu_v5,sigma_v5);
+            if scale2V>scale5V
                 corV5=corV5+1;
             end
             
             [~,scale2AV]=ghmm_fwd(feaAV5{i-10},A_av2,P0_av2,mu_av2,sigma_av2);
-            [~,scale5AV]=ghmm_fwd(feaAV5{i-10},tempA_av5,tempP0_av5,tempmu_av5,tempsigma_av5);
-            if sum(scale2AV)<sum(scale5AV)
+            [~,scale5AV]=ghmm_fwd(feaAV5{i-10},A_av5,P0_av5,mu_av5,sigma_av5);
+            if scale2AV>scale5AV
                 corAV5=corAV5+1;
             end
         end

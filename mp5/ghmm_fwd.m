@@ -33,7 +33,7 @@ for t=2:T,
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % disp('You need to insert a line of code into ghmm_fwd.m that computes')
   % disp('alpha0 from transition probs A, Gaussian probs Pys, and alpha(t-1)')
-  alpha0 = Pys(:,t-1).*sum(transpose(bsxfun(@times,A,alpha(:,t-1))),2);
+  alpha0 = Pys(:,t).*sum(transpose(bsxfun(@times,A,alpha(:,t-1))),2);
   scale(t) = sum(alpha0);
   alpha(:,t) = alpha0 / scale(t);
 end
