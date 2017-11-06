@@ -40,6 +40,13 @@ function run(path)
     corV5=0;
     corAV5=0;
     
+    corA2_v=0;
+    corV2_v=0;
+    corAV2_v=0;
+    corA5_v=0;
+    corV5_v=0;
+    corAV5_v=0;
+    
     [P0_a2,A_a2,mu_a2,sigma_a2]=ghmm_learn(feaA2,N,Ainit);
     [P0_v2,A_v2,mu_v2,sigma_v2]=ghmm_learn(feaV2,N,Ainit);
     [P0_av2,A_av2,mu_av2,sigma_av2]=ghmm_learn(feaAV2,N,Ainit);
@@ -48,7 +55,6 @@ function run(path)
     [P0_v5,A_v5,mu_v5,sigma_v5]=ghmm_learn(feaV5,N,Ainit);
     [P0_av5,A_av5,mu_av5,sigma_av5]=ghmm_learn(feaAV5,N,Ainit);
     
-    [delta,log_likelyhood,seq]=viterbi(feaA5{1},A_a5,P0_a5,mu_a5,sigma_a5);
     
     for i=1:20
         disp(i);
@@ -86,6 +92,24 @@ function run(path)
             if sum(scale2AV)>sum(scale5AV)
                 corAV2=corAV2+1;
             end
+            
+            [~,log_likelyhood2A,~]=viterbi(feaA2{i},tempA_a2,tempP0_a2,tempmu_a2,tempsigma_a2);
+            [~,log_likelyhood5A,~]=viterbi(feaA2{i},A_a5,P0_a5,mu_a5,sigma_a5);
+            if log_likelyhood2A>log_likelyhood5A
+                corA2_v=corA2_v+1;
+            end
+            
+            [~,log_likelyhood2V,~]=viterbi(feaV2{i},tempA_v2,tempP0_v2,tempmu_v2,tempsigma_v2);
+            [~,log_likelyhood5V,~]=viterbi(feaV2{i},A_v5,P0_v5,mu_v5,sigma_v5);
+            if log_likelyhood2V>log_likelyhood5V
+                corV2_v=corV2_v+1;
+            end
+            
+            [~,log_likelyhood2AV,~]=viterbi(feaAV2{i},tempA_av2,tempP0_av2,tempmu_av2,tempsigma_av2);
+            [~,log_likelyhood5AV,~]=viterbi(feaAV2{i},A_av5,P0_av5,mu_av5,sigma_av5);
+            if log_likelyhood2AV>log_likelyhood5AV
+                corAV2_v=corAV2_v+1;
+            end
         else
             k=1;
             for j=1:10
@@ -118,6 +142,24 @@ function run(path)
             if sum(scale2AV)<sum(scale5AV)
                 corAV5=corAV5+1;
             end
+            
+            [~,log_likelyhood2A,~]=viterbi(feaA5{i-10},A_a2,P0_a2,mu_a2,sigma_a2);
+            [~,log_likelyhood5A,~]=viterbi(feaA5{i-10},tempA_a5,tempP0_a5,tempmu_a5,tempsigma_a5);
+            if log_likelyhood2A<log_likelyhood5A
+                corA5_v=corA5_v+1;
+            end
+            
+            [~,log_likelyhood2V,~]=viterbi(feaV5{i-10},A_v2,P0_v2,mu_v2,sigma_v2);
+            [~,log_likelyhood5V,~]=viterbi(feaV5{i-10},tempA_v5,tempP0_v5,tempmu_v5,tempsigma_v5);
+            if log_likelyhood2V<log_likelyhood5V
+                corV5_v=corV5_v+1;
+            end
+            
+            [~,log_likelyhood2AV,~]=viterbi(feaAV5{i-10},A_av2,P0_av2,mu_av2,sigma_av2);
+            [~,log_likelyhood5AV,~]=viterbi(feaAV5{i-10},tempA_av5,tempP0_av5,tempmu_av5,tempsigma_av5);
+            if log_likelyhood2AV<log_likelyhood5AV
+                corAV5_v=corAV5_v+1;
+            end
         end
     end
     Acc=zeros(3,3);
@@ -130,8 +172,24 @@ function run(path)
     Acc(3,1)=(corA2+corA5)/20;
     Acc(3,2)=(corV2+corV5)/20;
     Acc(3,3)=(corAV2+corAV5)/20;
-    fprintf('\n -------- Accurcy: Audio + Visual ---------\n ');
-    display(array2table(Acc,'VariableNames',{'Audio_Recognition','Video_Recognition','AV_Recognition'},'RowNames',{'2','5','Overall'}));
+    fprintf('\n -------- Accurcy: Forward Backward ---------\n ');
+    table = array2table(Acc,'VariableNames',{'Audio_Recognition','Video_Recognition','AV_Recognition'},'RowNames',{'2','5','Overall'});
+    display(table);
+    fprintf('---------------------------------------\n');
+    
+    Acc_v=zeros(3,3);
+    Acc_v(1,1)=corA2_v/10;
+    Acc_v(1,2)=corV2_v/10;
+    Acc_v(1,3)=corAV2_v/10;
+    Acc_v(2,1)=corA5_v/10;
+    Acc_v(2,2)=corV5_v/10;
+    Acc_v(2,3)=corAV5_v/10;
+    Acc_v(3,1)=(corA2_v+corA5_v)/20;
+    Acc_v(3,2)=(corV2_v+corV5_v)/20;
+    Acc_v(3,3)=(corAV2_v+corAV5_v)/20;
+    fprintf('\n -------- Accurcy: Viterbi ---------\n ');
+    table = array2table(Acc_v,'VariableNames',{'Audio_Recognition','Video_Recognition','AV_Recognition'},'RowNames',{'2','5','Overall'});
+    display(table);
     fprintf('---------------------------------------\n');
 end
 

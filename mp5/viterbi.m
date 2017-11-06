@@ -19,7 +19,7 @@ function [delta, log_likelyhood, seq] = viterbi(Y,A,P0,mu,sigma)
     delta(:,1)=delta1;
     
     for t=2:T
-        [tmp,tmp_seq] = max(A+repmat(delta(:,t-1),1,N));
+        [tmp,tmp_seq] = max(bsxfun(@plus,A,delta(:,t-1)));
         seq(:,t)=transpose(tmp_seq);
         delta(:,t) = transpose(tmp)+Pys(:,t-1);
     end
