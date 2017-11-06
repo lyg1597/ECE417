@@ -117,5 +117,18 @@ function run(path)
             end
         end
     end
+    Acc=zeros(3,3);
+    Acc(1,1)=corA2/10;
+    Acc(1,2)=corV2/10;
+    Acc(1,3)=corAV2/10;
+    Acc(2,1)=corA5/10;
+    Acc(2,2)=corV5/10;
+    Acc(2,3)=corAV5/10;
+    Acc(3,1)=(corA2+corA5)/20;
+    Acc(3,2)=(corV2+corV5)/20;
+    Acc(3,3)=(corAV2+corAV5)/20;
+    fprintf('\n -------- Accurcy: Audio + Visual ---------\n ');
+    display(array2table(Acc,'VariableNames',{'Audio_Recognition','Video_Recognition','AV_Recognition'},'RowNames',{'2','5','Overall'}));
+    fprintf('---------------------------------------\n');
 end
 
