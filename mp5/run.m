@@ -47,6 +47,9 @@ function run(path)
     [P0_a5,A_a5,mu_a5,sigma_a5]=ghmm_learn(feaA5,N,Ainit);
     [P0_v5,A_v5,mu_v5,sigma_v5]=ghmm_learn(feaV5,N,Ainit);
     [P0_av5,A_av5,mu_av5,sigma_av5]=ghmm_learn(feaAV5,N,Ainit);
+    
+    [delta,log_likelyhood,seq]=viterbi(feaA5{1},A_a5,P0_a5,mu_a5,sigma_a5);
+    
     for i=1:20
         disp(i);
         tempfeaA={};
